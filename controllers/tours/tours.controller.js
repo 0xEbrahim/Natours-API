@@ -18,6 +18,15 @@ const checkId = (req, res, next, id) => {
   next();
 };
 
+const checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'Fail',
+      message: 'The name or price is not found',
+    });
+  }
+  next();
+};
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'Success',
@@ -80,4 +89,5 @@ export {
   deleteTour,
   createNewTour,
   checkId,
+  checkBody,
 };
