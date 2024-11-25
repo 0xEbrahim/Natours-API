@@ -89,11 +89,13 @@ const updateTour = (req, res) => {
   });
 };
 
-app.get('/api/v1/tours', getAllTours);
-app.get('/api/v1/tours/:id', getSingleTour);
-app.post('/api/v1/tours', createNewTour);
-app.patch('/api/v1/tours/:id', updateTour);
-app.delete('/api/v1/tours/:id', deleteTour);
+app.route('/api/v1/tours').get(getAllTours).post(createNewTour);
+
+app
+  .route('/api/v1/tours/:id')
+  .get(getSingleTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 app.listen(port, () => {
   console.log(`Application started running on port ${port}`);
