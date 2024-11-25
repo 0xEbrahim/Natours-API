@@ -1,3 +1,12 @@
+import fs from 'fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const tours = JSON.parse(
+  fs.readFileSync(`${__dirname}/../../dev-data/data/tours-simple.json`, 'utf-8')
+);
+
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'Success',
