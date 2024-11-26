@@ -1,8 +1,9 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
 import express from 'express';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import tourRouter from './routes/tourRoutes';
-import userRouter from './routes/userRoutes';
+import tourRouter from './routes/tourRoutes.js';
+import userRouter from './routes/userRoutes.js';
 
 dotenv.config();
 
