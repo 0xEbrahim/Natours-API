@@ -8,17 +8,8 @@ const aliasTop5Tours = async (req, res, next) => {
   next();
 };
 
-const aliasTop5Tours = async (req, res, next) => {
-  req.query.limit = 5;
-  req.query.sort = '-ratingAverage,price';
-  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
-  next();
-};
-
 const getAllTours = async (req, res) => {
   try {
-
-
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -97,11 +88,45 @@ const updateTour = async (req, res) => {
     });
   }
 };
+
+const getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingAverage: { $gte: 0.0 } }
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          numTours: { $sum: 1 },
+          numOfRatings: { $sum: '$ratingQuantity' },
+          avgRating: { $avg: '$ratingAverage' },
+          priceAverage: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }
+        }
+      },
+      {
+        $sort: { priceAverage: 1 }
+      }
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats
+      }
+    });
+  } catch (err) {
+    res.status(400).json();
+  }
+};
+
 export {
   getAllTours,
   getSingleTour,
   updateTour,
   deleteTour,
   createNewTour,
-  aliasTop5Tours
+  aliasTop5Tours,
+  getTourStats
 };
