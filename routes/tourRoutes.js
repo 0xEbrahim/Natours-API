@@ -6,8 +6,9 @@ import {
   updateTour,
   deleteTour,
   checkId,
-  checkBody,
+  checkBody
 } from '../controllers/tours/tours.controller.js';
+
 
 const router = express.Router();
 
