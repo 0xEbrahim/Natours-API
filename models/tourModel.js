@@ -39,7 +39,7 @@ const tourSchema = new mongoose.Schema({
     trim: true,
     required: [true, 'A tour must have a summary']
   },
-  descriptionm: {
+  description: {
     type: String,
     trim: true
   },
@@ -54,7 +54,8 @@ const tourSchema = new mongoose.Schema({
   ],
   createdAt: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
+    select: false
   },
   startDates: [{ type: Date }]
 });
