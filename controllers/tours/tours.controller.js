@@ -8,17 +8,8 @@ const aliasTop5Tours = async (req, res, next) => {
   next();
 };
 
-const aliasTop5Tours = async (req, res, next) => {
-  req.query.limit = 5;
-  req.query.sort = '-ratingAverage,price';
-  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
-  next();
-};
-
 const getAllTours = async (req, res) => {
   try {
-
-
     res.status(200).json({
       status: 'success',
       results: tours.length,
