@@ -1,12 +1,18 @@
 import Tour from '../../models/tourModel.js';
 
+const aliasTop5Tours = async (req, res, next) => {
+  req.query.limit = 5;
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
+  next();
+};
+
 const getAllTours = async (req, res) => {
   try {
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(el => delete queryObj[el]);
     let queryStr = JSON.stringify(queryObj);
-
     // replacing [gte, gt, lte, lt]
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
     queryStr = JSON.parse(queryStr);
@@ -16,7 +22,7 @@ const getAllTours = async (req, res) => {
     // Sorting
     if (req.query.sort) {
       let { sort } = req.query;
-      sort = sort.replace(',', ' ');
+      sort = sort.split(',').join(' ');
       query = query.sort(sort);
     } else {
       query = query.sort('-createdAt');
@@ -25,7 +31,9 @@ const getAllTours = async (req, res) => {
     // fields limiting
     if (req.query.fields) {
       let { fields } = req.query;
-      fields = fields.replace(',', ' ');
+      fields = fields.split(',').join(' ');
+      console.log(fields);
+
       query = query.select(fields);
     } else {
       query = query.select('-__v');
@@ -123,4 +131,11 @@ const updateTour = async (req, res) => {
     });
   }
 };
-export { getAllTours, getSingleTour, updateTour, deleteTour, createNewTour };
+export {
+  getAllTours,
+  getSingleTour,
+  updateTour,
+  deleteTour,
+  createNewTour,
+  aliasTop5Tours
+};
