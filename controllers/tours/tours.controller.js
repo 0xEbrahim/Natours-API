@@ -12,6 +12,8 @@ const getAllTours = async (req, res) => {
     queryStr = JSON.parse(queryStr);
 
     let query = Tour.find(queryStr);
+
+    // Sorting
     if (req.query.sort) {
       let { sort } = req.query;
       sort = sort.replace(',', ' ');
@@ -19,6 +21,16 @@ const getAllTours = async (req, res) => {
     } else {
       query = query.sort('-createdAt');
     }
+
+    // fields limiting
+    if (req.query.fields) {
+      let { fields } = req.query;
+      fields = fields.replace(',', ' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+
     const tours = await query;
     res.status(200).json({
       status: 'success',
