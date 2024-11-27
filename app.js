@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import { handleUnhandledRoutes } from './errors/handleUnhandledRoutes.js';
 
 dotenv.config();
 
@@ -19,5 +20,6 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.all('*', handleUnhandledRoutes);
 
 export default app;
