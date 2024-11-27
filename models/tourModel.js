@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+//import validator from 'validator';
 
 const tourSchema = new mongoose.Schema(
   {
@@ -15,7 +16,11 @@ const tourSchema = new mongoose.Schema(
       minlength: [
         10,
         'A tour name must have more than or equal to 10 characters'
-      ]
+      ],
+      // validate: [
+      //   validator.isAlpha,
+      //   'A tour name should only contains alpha characters'
+      // ]
     },
     slug: {
       type: String
@@ -36,13 +41,13 @@ const tourSchema = new mongoose.Schema(
         message: 'Difficulty should be from [easy , medium , difficult]'
       }
     },
-    ratingAverage: {
+    ratingsAverage: {
       type: Number,
       default: 0.0,
-      min: [1, 'Rating must be above 1.0'],
-      max: [5, 'Rating must be less than 5.0']
+      min: [1.0, 'Rating must be above 1.0'],
+      max: [5.0, 'Rating must be less than 5.0']
     },
-    ratingQuantity: {
+    ratingsQuantity: {
       type: Number,
       default: 0
     },
@@ -51,7 +56,13 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a price']
     },
     priceDiscount: {
-      type: Number
+      type: Number,
+      validate: {
+        validator: function(val) {
+          return val < this.price;
+        },
+        message: 'Invalid price discount value, should be less than the price'
+      }
     },
     summary: {
       type: String,
