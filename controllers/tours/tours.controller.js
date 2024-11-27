@@ -1,13 +1,14 @@
 import Tour from '../../models/tourModel.js';
+import APIError from '../../utils/APIError.js';
 import APIFeatures from '../../utils/APIFeatures.js';
 import { asyncCatch } from '../../utils/asyncCatch.js';
 
-const aliasTop5Tours = asyncCatch(async (req, res, next) => {
+const aliasTop5Tours = (req, res, next) => {
   req.query.limit = 5;
   req.query.sort = '-ratingAverage,price';
   req.query.fields = 'name,price,ratingAverage,summary,difficulty';
   next();
-});
+};
 
 const getAllTours = asyncCatch(async (req, res) => {
   const features = new APIFeatures(Tour.find(), req.query)
@@ -26,7 +27,9 @@ const getAllTours = asyncCatch(async (req, res) => {
 });
 const deleteTour = asyncCatch(async (req, res) => {
   const { id } = req.params;
-  await Tour.findByIdAndDelete(id);
+  const tour = await Tour.findByIdAndDelete(id);
+  if (!tour) return next(new APIError(`No tour found for ID: ${id}`, 404));
+
   res.status(204).json({ status: 'success', data: null });
 });
 const createNewTour = asyncCatch(async (req, res) => {
@@ -38,9 +41,10 @@ const createNewTour = asyncCatch(async (req, res) => {
     }
   });
 });
-const getSingleTour = asyncCatch(async (req, res) => {
+const getSingleTour = asyncCatch(async (req, res, next) => {
   const { id } = req.params;
   const tour = await Tour.findById(id);
+  if (!tour) return next(new APIError(`No tour found for ID: ${id}`, 404));
   res.status(200).json({
     status: 'success',
     data: {
@@ -49,14 +53,16 @@ const getSingleTour = asyncCatch(async (req, res) => {
   });
 });
 const updateTour = asyncCatch(async (req, res) => {
-  const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
   });
+  if (!tour) return next(new APIError(`No tour found for ID: ${id}`, 404));
+
   res.status(200).json({
     status: 'success',
     data: {
-      tour: updatedTour
+      tour: tour
     }
   });
 });
