@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import { handleUnhandledRoutes } from './errors/handleUnhandledRoutes.js';
+import { handleGlobalErrors } from './errors/handleGlobalErrors.js';
 
 dotenv.config();
 
@@ -21,12 +22,5 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.all('*', handleUnhandledRoutes);
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message
-  });
-});
+app.use(handleGlobalErrors);
 export default app;
