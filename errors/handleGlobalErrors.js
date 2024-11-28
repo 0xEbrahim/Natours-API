@@ -1,7 +1,7 @@
 import APIError from '../utils/APIError.js';
 
 const handleCastErrorDB = err => {
-  const message = `Invalid ${err.path}: ${err.value}`;
+  const message = `Invalid ${err.path}: ${err.value}.`;
   return new APIError(message, 400);
 };
 
