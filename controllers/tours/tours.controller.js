@@ -34,6 +34,7 @@ const deleteTour = asyncCatch(async (req, res) => {
 });
 const createNewTour = asyncCatch(async (req, res) => {
   const newTour = await Tour.create(req.body);
+  console.log('LOGGED');
   res.status(201).json({
     status: 'success',
     data: {
@@ -44,6 +45,7 @@ const createNewTour = asyncCatch(async (req, res) => {
 const getSingleTour = asyncCatch(async (req, res, next) => {
   const { id } = req.params;
   const tour = await Tour.findById(id);
+  console.log(id);
   if (!tour) return next(new APIError(`No tour found for ID: ${id}`, 404));
   res.status(200).json({
     status: 'success',
