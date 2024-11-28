@@ -1,6 +1,6 @@
 const getAllUsers = (req, res) => {
   res.status(200).json({
-    message: 'Working on',
+    message: 'Working on'
   });
 };
 const getUser = (req, res) => {};
