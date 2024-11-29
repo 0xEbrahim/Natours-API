@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import User from '../../models/userModel.js';
 import { asyncCatch } from '../../utils/asyncCatch.js';
 import APIError from '../../utils/APIError.js';
@@ -77,6 +78,29 @@ const forgotPassword = asyncCatch(async (req, res, next) => {
 });
 const resetPassword = asyncCatch(async (req, res, next) => {
   const { resetPasswordToken } = req.params;
+  const encodedToken = crypto
+    .createHash('sha256')
+    .update(resetPasswordToken)
+    .digest('hex');
+  const user = await User.findOne({
+    passwordResetToken: encodedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+  if (!user)
+    return next(new APIError('Invalid or expired password reset token', 400));
+
+  const { password, passwordConfirm } = req.body;
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordChangedAt = Date.now();
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+  const token = signToken(user._id);
+  res.status(201).json({
+    status: 'success',
+    token
+  });
 });
 
 const protect = asyncCatch(async (req, res, next) => {
