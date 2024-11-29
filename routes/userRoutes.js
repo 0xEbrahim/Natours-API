@@ -7,12 +7,20 @@ import {
   updateUser,
   deleteUser
 } from '../controllers/users/users.controller.js';
-import { login, protect, signUp } from '../controllers/Auth/auth.controller.js';
+import {
+  forgotPassword,
+  login,
+  protect,
+  resetPassword,
+  signUp
+} from '../controllers/Auth/auth.controller.js';
 
 const router = express.Router();
 
 router.post('/signup', signUp);
 router.post('/login', login);
+router.post('/forgotPassword', forgotPassword);
+router.post('/resetPassword', resetPassword);
 
 router.get('/', protect, getAllUsers);
 router.get('/:id', getUser);

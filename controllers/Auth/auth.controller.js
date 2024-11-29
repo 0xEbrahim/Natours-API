@@ -36,6 +36,15 @@ const login = asyncCatch(async (req, res, next) => {
   });
 });
 
+const forgotPassword = asyncCatch(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user)
+    return next(new APIError('There is not user with this email ', 404));
+  const resetPasswordToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+});
+const resetPassword = asyncCatch(async (req, res, next) => {});
+
 const protect = asyncCatch(async (req, res, next) => {
   const { authorization } = req.headers;
   let token;
@@ -79,4 +88,4 @@ const restrictTo = (...roles) => {
   };
 };
 
-export { signUp, login, protect, restrictTo };
+export { signUp, login, protect, restrictTo, forgotPassword, resetPassword };
