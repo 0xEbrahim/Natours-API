@@ -2,6 +2,7 @@ import User from '../../models/userModel.js';
 import { asyncCatch } from '../../utils/asyncCatch.js';
 import APIError from '../../utils/APIError.js';
 import { signToken, verfiyToken } from '../../utils/JWT.js';
+import { sendEmail } from '../../utils/email.js';
 
 const signUp = asyncCatch(async (req, res, next) => {
   const user = await User.create({
@@ -42,8 +43,41 @@ const forgotPassword = asyncCatch(async (req, res, next) => {
     return next(new APIError('There is not user with this email ', 404));
   const resetPasswordToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
+  const resetURL = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/resetPassword/${resetPasswordToken}`;
+
+  const message = `Forgot your password?..,
+   send a PATCH request with your new password and password confirmation to this URL: ${resetURL} \n
+   If you didn't forgot your password, please skip this email`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token (Valid only for 10 mins)',
+      message: message
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to your email, please check it out'
+    });
+  } catch (err) {
+    user.passwordResetExpires = undefined;
+    user.passwordResetToken = undefined;
+    user.save({ validateBeforeSave: false });
+
+    return next(
+      new APIError(
+        'Error occurs while sending the email, please try again later',
+        500
+      )
+    );
+  }
 });
-const resetPassword = asyncCatch(async (req, res, next) => {});
+const resetPassword = asyncCatch(async (req, res, next) => {
+  const { resetPasswordToken } = req.params;
+});
 
 const protect = asyncCatch(async (req, res, next) => {
   const { authorization } = req.headers;
