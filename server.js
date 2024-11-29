@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
-
+// Handle uncaught exceptions
+process.on('uncaughtException', err => {
+  console.log('Uncaught exception happened, server is about to shurtdown');
+  console.log(err.name, err.message);
+  process.exit(1);
+});
 
 import app from './app.js';
 

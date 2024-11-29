@@ -45,6 +45,17 @@ const sendProdErrors = (err, res) => {
     });
   }
 };
+
+const handleJWTError = err => {
+  const message = `Invalid token: ${err.message}`;
+  return new APIError(message, 401);
+};
+
+const handleExpiredTokenError = () => {
+  const message = `Expired token, please login again.`;
+  return new APIError(message, 401);
+};
+
 const handleGlobalErrors = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendDevErrors(err, res);
@@ -52,7 +63,11 @@ const handleGlobalErrors = (err, req, res, next) => {
     let error = { ...err };
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDublicateErrorDB(error);
-    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
+    if (error.name === 'ValidationError')
+      error = handleValidationErrorDB(error);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError(error);
+    if (err.name === 'TokenExpiredError')
+      error = handleExpiredTokenError();
     sendProdErrors(error, res);
   }
 };
