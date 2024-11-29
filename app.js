@@ -6,12 +6,7 @@ import userRouter from './routes/userRoutes.js';
 import { handleUnhandledRoutes } from './errors/handleUnhandledRoutes.js';
 import { handleGlobalErrors } from './errors/handleGlobalErrors.js';
 
-// Handle uncaught exceptions
-process.on('uncaughtException', err => {
-  console.log('Uncaought exception happened, server is about to shurtdown');
-  console.log(err.name, err.message);
-  process.exit(1);
-});
+
 
 dotenv.config();
 

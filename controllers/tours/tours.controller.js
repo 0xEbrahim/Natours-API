@@ -10,7 +10,7 @@ const aliasTop5Tours = (req, res, next) => {
   next();
 };
 
-const getAllTours = asyncCatch(async (req, res) => {
+const getAllTours = asyncCatch(async (req, res, next) => {
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
     .sort()
@@ -25,14 +25,14 @@ const getAllTours = asyncCatch(async (req, res) => {
     }
   });
 });
-const deleteTour = asyncCatch(async (req, res) => {
+const deleteTour = asyncCatch(async (req, res, next) => {
   const { id } = req.params;
   const tour = await Tour.findByIdAndDelete(id);
   if (!tour) return next(new APIError(`No tour found for ID: ${id}`, 404));
 
   res.status(204).json({ status: 'success', data: null });
 });
-const createNewTour = asyncCatch(async (req, res) => {
+const createNewTour = asyncCatch(async (req, res, next) => {
   const newTour = await Tour.create(req.body);
   console.log('LOGGED');
   res.status(201).json({
@@ -54,7 +54,7 @@ const getSingleTour = asyncCatch(async (req, res, next) => {
     }
   });
 });
-const updateTour = asyncCatch(async (req, res) => {
+const updateTour = asyncCatch(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
@@ -69,7 +69,7 @@ const updateTour = asyncCatch(async (req, res) => {
   });
 });
 
-const getTourStats = asyncCatch(async (req, res) => {
+const getTourStats = asyncCatch(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
       $match: { ratingAverage: { $gte: 0.0 } }
@@ -97,7 +97,7 @@ const getTourStats = asyncCatch(async (req, res) => {
   });
 });
 
-const getMonthlyPlan = asyncCatch(async (req, res) => {
+const getMonthlyPlan = asyncCatch(async (req, res, next) => {
   const year = +req.params.year;
   console.log(year);
   const plan = await Tour.aggregate([
