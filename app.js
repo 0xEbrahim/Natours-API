@@ -1,12 +1,12 @@
 import express from 'express';
 import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import { handleUnhandledRoutes } from './errors/handleUnhandledRoutes.js';
 import { handleGlobalErrors } from './errors/handleGlobalErrors.js';
-
-
 
 dotenv.config();
 
@@ -14,11 +14,24 @@ dotenv.config();
 const app = express();
 
 // middlewares
-app.use(express.json());
+
+// set security http headers
+app.use(helmet());
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// limit requests - prevent eate limit
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try afain in an hour!'
+});
+app.use('/api', limiter);
+
+
+app.use(express.json({limit:'10kb'}));
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
