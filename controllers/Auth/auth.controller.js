@@ -2,8 +2,9 @@ import crypto from 'crypto';
 import User from '../../models/userModel.js';
 import { asyncCatch } from '../../utils/asyncCatch.js';
 import APIError from '../../utils/APIError.js';
-import { signToken, verfiyToken } from '../../utils/JWT.js';
+import { verfiyToken } from '../../utils/JWT.js';
 import { sendEmail } from '../../utils/email.js';
+import { createSendToken } from '../../utils/createSendToken.js';
 
 const signUp = asyncCatch(async (req, res, next) => {
   const user = await User.create({
@@ -13,14 +14,7 @@ const signUp = asyncCatch(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role || undefined
   });
-  const token = signToken(user._id);
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user
-    }
-  });
+  createSendToken(user, 201, res);
 });
 
 const login = asyncCatch(async (req, res, next) => {
@@ -31,11 +25,7 @@ const login = asyncCatch(async (req, res, next) => {
   const user = await User.findOne({ email: email }).select('+password');
   if (!user || !(await user.matchPassword(password, user.password)))
     return next(new APIError('Wrong email or password', 401));
-  const token = signToken(user._id);
-  res.status(201).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 201, res);
 });
 
 const forgotPassword = asyncCatch(async (req, res, next) => {
@@ -82,6 +72,7 @@ const resetPassword = asyncCatch(async (req, res, next) => {
     .createHash('sha256')
     .update(resetPasswordToken)
     .digest('hex');
+
   const user = await User.findOne({
     passwordResetToken: encodedToken,
     passwordResetExpires: { $gt: Date.now() }
@@ -92,15 +83,10 @@ const resetPassword = asyncCatch(async (req, res, next) => {
   const { password, passwordConfirm } = req.body;
   user.password = password;
   user.passwordConfirm = passwordConfirm;
-  user.passwordChangedAt = Date.now();
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-  const token = signToken(user._id);
-  res.status(201).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 201, res);
 });
 
 const protect = asyncCatch(async (req, res, next) => {
@@ -146,4 +132,27 @@ const restrictTo = (...roles) => {
   };
 };
 
-export { signUp, login, protect, restrictTo, forgotPassword, resetPassword };
+const updatePassword = asyncCatch(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('+password');
+  const currentPassword = req.body.currentPassword;
+  const password = req.body.password;
+  const passwordConfirm = req.body.passwordConfirm;
+  if (!(await user.matchPassword(currentPassword, user.password)))
+    return next(
+      new APIError('You enter the current password incorrectly.', 401)
+    );
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+  createSendToken(user, 200, res);
+});
+
+export {
+  signUp,
+  login,
+  protect,
+  restrictTo,
+  updatePassword,
+  forgotPassword,
+  resetPassword
+};

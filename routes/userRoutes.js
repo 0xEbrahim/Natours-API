@@ -12,7 +12,8 @@ import {
   login,
   protect,
   resetPassword,
-  signUp
+  signUp,
+  updatePassword
 } from '../controllers/Auth/auth.controller.js';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ const router = express.Router();
 router.post('/signup', signUp);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
+router.patch('/updatePassword', protect, updatePassword)
 router.patch('/resetPassword/:resetPasswordToken', resetPassword);
 
 router.get('/', protect, getAllUsers);
