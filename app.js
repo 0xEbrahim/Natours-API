@@ -1,6 +1,8 @@
 import express from 'express';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import tourRouter from './routes/tourRoutes.js';
@@ -30,8 +32,13 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+app.use(express.json({ limit: '10kb' }));
 
-app.use(express.json({limit:'10kb'}));
+// Data sanitization against NoSQL injection
+app.use(mongoSanitize());
+
+/// Data sanitization agains XSS
+app.use(xss());
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
