@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
+import hpp from 'hpp';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import tourRouter from './routes/tourRoutes.js';
@@ -39,6 +40,20 @@ app.use(mongoSanitize());
 
 /// Data sanitization agains XSS
 app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price'
+    ]
+  })
+);
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);

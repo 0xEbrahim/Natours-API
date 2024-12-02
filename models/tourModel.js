@@ -16,7 +16,7 @@ const tourSchema = new mongoose.Schema(
       minlength: [
         10,
         'A tour name must have more than or equal to 10 characters'
-      ],
+      ]
       // validate: [
       //   validator.isAlpha,
       //   'A tour name should only contains alpha characters'
@@ -91,7 +91,48 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [
+        {
+          type: Number
+        }
+      ],
+      address: {
+        type: String
+      },
+      description: { type: String }
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [
+          {
+            type: Number
+          }
+        ],
+        address: {
+          type: String
+        },
+        description: { type: String },
+        day: Number
+      }
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     toJSON: {
@@ -107,6 +148,13 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+// Embedd tour guides
+// tourSchema.pre('save', async function(next) {
+//   const embeddedGuides = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(embeddedGuides);
+//   next();
+// });
+
 // Doc middlware
 tourSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
@@ -117,6 +165,15 @@ tourSchema.pre('save', function(next) {
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+// query middlware to populate
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt'
+  });
   next();
 });
 
