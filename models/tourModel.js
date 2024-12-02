@@ -148,12 +148,12 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
-// Embedd tour guides
-// tourSchema.pre('save', async function(next) {
-//   const embeddedGuides = this.guides.map(async id => await User.findById(id));
-//   this.guides = await Promise.all(embeddedGuides);
-//   next();
-// });
+// Virtual populating
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
 
 // Doc middlware
 tourSchema.pre('save', function(next) {

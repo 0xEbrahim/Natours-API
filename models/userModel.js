@@ -77,6 +77,12 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+userSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'user',
+  localField: '_id'
+});
+
 userSchema.methods.matchPassword = async (candiPassword, password) => {
   return await bcrypt.compare(candiPassword, password);
 };
