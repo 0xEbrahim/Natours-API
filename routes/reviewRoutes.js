@@ -11,9 +11,19 @@ import { handleRequestBeforeCreatingReview } from '../middlewares/handleRequestB
 
 const router = express.Router({ mergeParams: true });
 
-router.get('/', protect, getAllReviews);
-router.get('/:id', protect, getReview);
-router.post('/', protect, restrictTo('user', 'admin'),handleRequestBeforeCreatingReview, createReview);
-router.delete('/:id', protect, deleteReview);
+router.use(protect);
+
+router.get('/', getAllReviews);
+router.get('/:id', getReview);
+router.post(
+  '/',
+  restrictTo('user'),
+  handleRequestBeforeCreatingReview,
+  createReview
+);
+
+router.use(restrictTo('user', 'admin'));
+
+router.delete('/:id', deleteReview);
 router.patch('/:id', updateReview);
 export default router;
