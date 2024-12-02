@@ -126,6 +126,12 @@ const tourSchema = new mongoose.Schema(
         description: { type: String },
         day: Number
       }
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
     ]
   },
   {
@@ -141,6 +147,13 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
+
+// Embedd tour guides
+// tourSchema.pre('save', async function(next) {
+//   const embeddedGuides = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(embeddedGuides);
+//   next();
+// });
 
 // Doc middlware
 tourSchema.pre('save', function(next) {
