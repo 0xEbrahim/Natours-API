@@ -4,7 +4,6 @@ import { asyncCatch } from '../../utils/asyncCatch.js';
 import { filterBody } from '../../utils/filteringBody.js';
 import Factory from '../../utils/factoryHandler.js';
 
-
 const updateCurrentAuthUser = asyncCatch(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm)
     return next(new APIError("You can't update password on this page", 400));
@@ -28,7 +27,10 @@ const deleteCurrentAuthUser = asyncCatch(async (req, res, next) => {
   });
 });
 
-
+const getCurrentAuthUser = asyncCatch(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+});
 
 const getAllUsers = Factory.getAll(User);
 const getUser = Factory.getOne(User);
@@ -41,5 +43,6 @@ export {
   updateUser,
   deleteUser,
   updateCurrentAuthUser,
-  deleteCurrentAuthUser
+  deleteCurrentAuthUser,
+  getCurrentAuthUser
 };

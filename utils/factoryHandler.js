@@ -46,7 +46,6 @@ class Factory {
 
   getOne(Model, popOptions) {
     return asyncCatch(async (req, res, next) => {
-      console.log(popOptions);
       let query = Model.findById(req.params.id);
       if (popOptions) query = query.populate(popOptions);
       const doc = await query;

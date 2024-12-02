@@ -11,17 +11,21 @@ import {
   getMonthlyPlan
 } from '../controllers/tours/tours.controller.js';
 import { protect, restrictTo } from '../controllers/Auth/auth.controller.js';
-
 const router = express.Router();
 
 router.use('/:tourId/reviews', reviewRouter);
 router.get('/tour-stats', getTourStats);
-router.get('/monthly-plan/:year', getMonthlyPlan);
+router.get(
+  '/monthly-plan/:year',
+  protect,
+  restrictTo('admin', 'lead-guide','guide'),
+  getMonthlyPlan
+);
 router.get('/top-5-cheap', aliasTop5Tours, getAllTours);
 router.get('/', getAllTours);
 router.get('/:id', getTour);
-router.post('/', createTour);
-router.patch('/:id', updateTour);
+router.post('/', protect, restrictTo('admin', 'lead-guide'), createTour);
+router.patch('/:id', protect, restrictTo('admin', 'lead-guide'), updateTour);
 router.delete('/:id', protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 export default router;
