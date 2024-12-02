@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import reviewRouter from './routes/reviewRoutes.js';
 import { handleUnhandledRoutes } from './errors/handleUnhandledRoutes.js';
 import { handleGlobalErrors } from './errors/handleGlobalErrors.js';
 
@@ -57,6 +58,7 @@ app.use(
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 app.all('*', handleUnhandledRoutes);
 app.use(handleGlobalErrors);
 export default app;
