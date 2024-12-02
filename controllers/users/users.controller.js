@@ -2,17 +2,8 @@ import User from '../../models/userModel.js';
 import APIError from '../../utils/APIError.js';
 import { asyncCatch } from '../../utils/asyncCatch.js';
 import { filterBody } from '../../utils/filteringBody.js';
+import Factory from '../../utils/factoryHandler.js';
 
-const getAllUsers = asyncCatch(async (req, res) => {
-  const users = await User.find();
-  res.status(200).json({
-    users
-  });
-});
-const getUser = (req, res, next) => {};
-const createUser = (req, res, next) => {};
-const updateUser = (req, res, next) => {};
-const deleteUser = (req, res, next) => {};
 
 const updateCurrentAuthUser = asyncCatch(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm)
@@ -37,10 +28,16 @@ const deleteCurrentAuthUser = asyncCatch(async (req, res, next) => {
   });
 });
 
+
+
+const getAllUsers = Factory.getAll(User);
+const getUser = Factory.getOne(User);
+const updateUser = Factory.updateOne(User);
+const deleteUser = Factory.deleteOne(User);
+
 export {
   getAllUsers,
   getUser,
-  createUser,
   updateUser,
   deleteUser,
   updateCurrentAuthUser,

@@ -3,7 +3,6 @@ import express from 'express';
 import {
   getAllUsers,
   getUser,
-  createUser,
   updateUser,
   deleteUser,
   updateCurrentAuthUser,
@@ -14,6 +13,7 @@ import {
   login,
   protect,
   resetPassword,
+  restrictTo,
   signUp,
   updatePassword
 } from '../controllers/Auth/auth.controller.js';
@@ -29,8 +29,7 @@ router.delete('/deleteMe', protect, deleteCurrentAuthUser);
 router.patch('/resetPassword/:resetPasswordToken', resetPassword);
 router.get('/', protect, getAllUsers);
 router.get('/:id', getUser);
-router.post('/', createUser);
 router.patch('/:id', updateUser);
-router.delete('/:id', deleteUser);
+router.delete('/:id', protect, restrictTo('admin'), deleteUser);
 
 export default router;
