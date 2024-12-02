@@ -6,7 +6,8 @@ import {
   updateUser,
   deleteUser,
   updateCurrentAuthUser,
-  deleteCurrentAuthUser
+  deleteCurrentAuthUser,
+  getCurrentAuthUser
 } from '../controllers/users/users.controller.js';
 import {
   forgotPassword,
@@ -26,6 +27,7 @@ router.post('/forgotPassword', forgotPassword);
 router.patch('/updatePassword', protect, updatePassword);
 router.patch('/updateMe', protect, updateCurrentAuthUser);
 router.delete('/deleteMe', protect, deleteCurrentAuthUser);
+router.get('/getMe', protect, getCurrentAuthUser, getUser);
 router.patch('/resetPassword/:resetPasswordToken', resetPassword);
 router.get('/', protect, getAllUsers);
 router.get('/:id', getUser);
